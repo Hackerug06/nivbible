@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Bible Navigation</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background-color: #f4f4f4;
+            --text-color: #333;
+            --highlight-color: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        #app-header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .navigation-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        #book-select, #chapter-select, #verse-select {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: white;
+            font-size: 16px;
+        }
+
+        #bible-content {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            padding: 25px;
+            min-height: 400px;
+        }
+
+        .verse-detail {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+            border-left: 4px solid var(--secondary-color);
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .verse-number {
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-right: 15px;
+            min-width: 50px;
+        }
+
+        .verse-text {
+            flex-grow: 1;
+            margin-right: 15px;
+        }
+
+        .verse-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* Responsive Design Media Queries */
+        @media screen and (max-width: 768px) {
+            .navigation-section {
+                flex-direction: column;
+            }
+
+            #book-select, #chapter-select, #verse-select {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header id="app-header">
+            <h1>Comprehensive Bible Navigation</h1>
+        </header>
+
+        <div class="navigation-section">
+            <select id="book-select">
+                <option value="">Select Book</option>
+            </select>
+            <select id="chapter-select">
+                <option value="">Select Chapter</option>
+            </select>
+            <select id="verse-select">
+                <option value="">Select Verse</option>
+            </select>
+        </div>
+
+        <div id="bible-content">
+            <div id="selected-verse-details">
+                <!-- Detailed verse information will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ComprehensiveBibleNavigation {
+            constructor() {
+                // Comprehensive Bible structure
+                this.bibleStructure = {
+                    'Genesis': {
+                        1: 31,  // Chapter 1 has 31 verses
+                        2: 25,  // Chapter 2 has 25 verses
+                        3: 24   // Chapter 3 has 24 verses
+                    },
+                    'Exodus': {
+                        1: 22,
+                        2: 25,
+                        3: 21
+                    },
+                    'Matthew': {
+                        1: 25,
+                        2: 23,
+                        3: 17
+                    }
+                };
+
+                // Initialize DOM elements
+                this.bookSelect = document.getElementById('book-select');
+                this.chapterSelect = document.getElementById('chapter-select');
+                this.verseSelect = document.getElementById('verse-select');
+                this.bibleContent = document.getElementById('selected-verse-details');
+
+                // Setup initial state
+                this.initializeBookSelect();
+                this.attachEventListeners();
+            }
+
+            initializeBookSelect() {
+                // Populate books
+                Object.keys(this.bibleStructure).forEach(book => {
+                    const option = document.createElement('option');
+                    option.value = book;
+                    option.textContent = book;
+                    this.bookSelect.appendChild(option);
+                });
+            }
+
+            attachEventListeners() {
+                this.bookSelect.addEventListener('change', () => this.onBookChange());
+                this.chapterSelect.addEventListener('change', () => this.onChapterChange());
+                this.verseSelect.addEventListener('change', () => this.displayVerseDetails());
+            }
+
+            onBookChange() {
+                const selectedBook = this.bookSelect.value;
+                
+                // Reset chapter and verse selects
+                this.chapterSelect.innerHTML = '<option value="">Select Chapter</option>';
+                this.verseSelect.innerHTML = '<option value="">Select Verse</option>';
+
+                // Populate chapters for selected book
+                if (selectedBook) {
+                    Object.keys(this.bibleStructure[selectedBook]).forEach(chapter => {
+                        const option = document.createElement('option');
+                        option.value = chapter;
+                        option.textContent = `Chapter ${chapter}`;
+                        this.chapterSelect.appendChild(option);
+                    });
+                }
+            }
+
+            onChapterChange() {
+                const selectedBook = this.bookSelect.value;
+                const selectedChapter = this.chapterSelect.value;
+
+                // Reset verse select
+                this.verseSelect.innerHTML = '<option value="">Select Verse</option>';
+
+                // Populate verses for selected chapter
+                if (selectedBook && selectedChapter) {
+                    const verseCount = this.bibleStructure[selectedBook][selectedChapter];
+                    
+                    for (let verse = 1; verse <= verseCount; verse++) {
+                        const option = document.createElement('option');
+                        option.value = verse;
+                        option.textContent = `Verse ${verse}`;
+                        this.verseSelect.appendChild(option);
+                    }
+                }
+            }
+
+            displayVerseDetails() {
+                const book = this.bookSelect.value;
+                const chapter = this.chapterSelect.value;
+                const verse = this.verseSelect.value;
+
+                if (book && chapter && verse) {
+                    // Simulate verse details (in a real app, this would fetch from a Bible API)
+                    const verseText = this.generateVerseText(book, chapter, verse);
+
+                    this.bibleContent.innerHTML = `
+                        <div class="verse-detail">
+                            <div class="verse-number">${book} ${chapter}:${verse}</div>
+                            <div class="verse-text">${verseText}</div>
+                            <div class="verse-actions">
+                                <button class="btn">Copy</button>
+                                <button class="btn">Share</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            generateVerseText(book, chapter, verse) {
+                // Simplified verse generation
+                const verseTexts = {
+                    'Genesis': {
+                        1: {
+                            1: 'In the beginning God created the heavens and the earth.',
+                            2: 'Now the earth was formless and empty, darkness was over the surface of the deep.'
+                        }
+                    },
+                    'Exodus': {
+                        1: {
+                            1: 'These are the names of the sons of Israel who went to Egypt with Jacob.'
+                        }
+                    },
+                    'Matthew': {
+                        1: {
+                            1: 'This is the genealogy of Jesus the Messiah the son of David, the son of Abraham.'
+                        }
+                    }
+                };
+
+                // Return a default text if specific verse is not found
+                return verseTexts[book]?.[chapter]?.[verse] || 
+                       `Sample verse text for ${book} ${chapter}:${verse}`;
+            }
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            new ComprehensiveBibleNavigation();
+        });
+    </script>
+</body>
+      </html>
